@@ -107,7 +107,7 @@ pub mod account {
             }
         }
 
-        screenshot::screenshot::get_png(tab, Some("withdraw.png".to_string()))?;
+        screenshot::screenshot::get_png(tab, Some("final.png".to_string()))?;
 
         Ok(())
     }
