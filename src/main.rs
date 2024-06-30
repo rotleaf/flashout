@@ -48,7 +48,7 @@ async fn begin(p_args: Args) -> Result<(), Box<dyn Error>> {
     let launch_options: headless_chrome::LaunchOptions = LaunchOptionsBuilder::default()
         .args(os_args)
         .headless(true)
-        .user_data_dir(Some(PathBuf::from("/tmp")))
+        //.user_data_dir(Some(PathBuf::from("/tmp")))
         .disable_default_args(true)
         .build()
         .unwrap();
