@@ -1,7 +1,8 @@
 pub mod account {
     use std::{env, error::Error, sync::Arc, time::Duration};
 
-    use headless_chrome::Tab;
+    use colored::Colorize;
+    use headless_chrome::{Browser, Tab};
 
     use crate::{bot::login, utils::screenshot};
 
@@ -10,12 +11,13 @@ pub mod account {
         amount: i32,
         phone: String,
         op: i64,
+        browser: Browser
     ) -> Result<(), Box<dyn Error>> {
         let url: &str = "https://flashout.io/account/rewards";
         tab.navigate_to(url)?;
         tab.wait_until_navigated()?;
 
-        println!(" > checking auth status");
+        println!(" > {}", "checking auth status".bold().yellow());
         if tab
             .wait_for_element_with_custom_timeout(
                 ".v-toolbar-title__placeholder",
@@ -23,8 +25,8 @@ pub mod account {
             )
             .is_ok()
         {
-            println!(" > not logged in, loggin in");
-            let _ = login::login::init(tab.clone()).await;
+            println!(" > not logged in-[{}]", "loggin in".bold().yellow());
+            let _ = login::login::init(tab.clone(), browser).await;
             let url: &str = "https://flashout.io/account/rewards";
             tab.navigate_to(url)?;
             tab.wait_until_navigated()?;
@@ -48,11 +50,10 @@ pub mod account {
 
         let balance: headless_chrome::Element = tab.wait_for_element(".text-h3")?; // you can see the balance
         println!(" * Your balance is {}", balance.get_inner_text()?);
-        
 
         let currency: String = env::var("CURRENCY").expect("CURRENCY not set yet");
         let redeem_button: headless_chrome::Element = tab.find_element(".bg-primary").unwrap();
-        println!(" > trying to redeem {}{}", amount, currency);
+        println!(" > trying to redeem {}{}", amount, currency.bold().green());
         redeem_button.click().unwrap();
         let _ = tab.wait_until_navigated().unwrap();
         tab.wait_for_element("label.v-label:nth-child(2)")?;
@@ -106,10 +107,10 @@ pub mod account {
 
         match tab.wait_for_element("div.v-container:nth-child(3)") {
             Ok(_) => {
-                println!(" > credit delivered-{}{}", amount, currency);
+                println!(" > credit delivered-[{}{}]", amount.to_string().bold(), currency.to_string().bold());
             }
             Err(err) => {
-                println!(" * error : {err}");
+                println!(" * {}-[{}]", "error".bold().red(), err.to_string().bold().red());
             }
         }
 

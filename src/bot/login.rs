@@ -1,9 +1,9 @@
 pub mod login {
-    use std::{env, error::Error, sync::Arc, thread, time::Duration};
+    use colored::Colorize;
+    use headless_chrome::{ Browser, Tab};
+    use std::{env, error::Error, process, sync::Arc, thread, time::Duration};
 
-    use headless_chrome::Tab;
-
-    pub async fn init(tab: Arc<Tab>) -> Result<(), Box<dyn Error>> {
+    pub async fn init(tab: Arc<Tab>, browser: Browser) -> Result<(), Box<dyn Error>> {
         let email = env::var("EMAIL").expect("set EMAIL");
         let password = env::var("PASSWORD").expect("set PASSWORD");
         tab.navigate_to("https://flashout.io/login")?;
@@ -24,9 +24,23 @@ pub mod login {
         let _ = tab.wait_until_navigated();
 
         thread::sleep(Duration::from_secs(2));
-        let _ = tab.wait_for_element("div.v-card");
-        println!("logged in");
-
+        if tab.wait_for_element("div.v-alert:nth-child(3)").is_ok() {
+            println!(
+                " * {}-[{}]",
+                "check credentials".bold().red(),
+                "login failed".bold().yellow()
+            );
+            // close all tabs
+            let tabs: &Arc<std::sync::Mutex<Vec<Arc<Tab>>>> = browser.get_tabs();
+            let locked_tabs = tabs.lock().expect("failed to lock tabs mutex");
+            for tab in locked_tabs.iter() {
+                tab.close_target()?;
+            }
+            // process::exit(0);
+        } else {
+            let _ = tab.wait_for_element("div.v-card");
+            println!(" - {}", "logged in".bold().green());
+        }
         Ok(())
     }
 }

@@ -1,3 +1,4 @@
+
 use std::error::Error;
 use std::ffi::OsStr;
 use std::path::PathBuf;
@@ -64,7 +65,7 @@ async fn begin(p_args: Args) -> Result<(), Box<dyn Error>> {
     let browser: Browser = Browser::new(launch_options)?;
     let tab: Arc<headless_chrome::Tab> = browser.new_tab()?;
     // tab.enable_fetch(None, None)?;
-    let _ = login::init(tab.clone());
+    let _ = login::init(tab.clone(), browser.clone());
     if p_args.action == Some("withdraw".to_string())
         || p_args.action == Some("Withdraw".to_string())
         || p_args.action == Some("redeem".to_string())
@@ -94,6 +95,7 @@ async fn begin(p_args: Args) -> Result<(), Box<dyn Error>> {
             p_args.credit_amount.unwrap(),
             p_args.phone.unwrap(),
             op,
+            browser,
         )
         .await;
     } else {
