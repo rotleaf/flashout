@@ -1,4 +1,3 @@
-
 use std::error::Error;
 use std::ffi::OsStr;
 use std::path::PathBuf;
@@ -8,6 +7,7 @@ use std::{env, process};
 use bot::account::account::redeem_airtime;
 use bot::login::login;
 use clap::{command, ArgAction, Parser};
+use colored::Colorize;
 use dotenv::dotenv;
 use headless_chrome::{Browser, LaunchOptionsBuilder};
 
@@ -15,7 +15,7 @@ pub mod bot;
 pub mod utils;
 
 #[derive(Parser, Debug)]
-#[command(version, about, long_about = None)]
+#[command(version="0.1.2-beta", about="flashout autopilot", long_about = None)]
 struct Args {
     /// action to perform, [withdraw or redeem, tasks]
     #[arg(short, long)]
@@ -66,30 +66,18 @@ async fn begin(p_args: Args) -> Result<(), Box<dyn Error>> {
     let tab: Arc<headless_chrome::Tab> = browser.new_tab()?;
     // tab.enable_fetch(None, None)?;
     let _ = login::init(tab.clone(), browser.clone());
-    if p_args.action == Some("withdraw".to_string())
-        || p_args.action == Some("Withdraw".to_string())
-        || p_args.action == Some("redeem".to_string())
-        || p_args.action == Some("Redeem".to_string())
+    if p_args.action.as_deref().map(str::to_lowercase) == Some("withdraw".to_string())
+        || p_args.action.as_deref().map(str::to_lowercase) == Some("redeem".to_string())
     {
-        let mut op = 0;
-        if p_args.network == Some("Airtel".to_string())
-            || p_args.network == Some("airtel".to_string())
-        {
-            // op = 265;
-            op = 3;
-        } else if p_args.network == Some("Safaricom".to_string())
-            || p_args.network == Some("safaricom".to_string())
-            || p_args.network == Some("saf".to_string())
-            || p_args.network == Some("Saf".to_string())
-        {
-            // op = 266;
-            op = 2;
-        } else {
-            println!(" * Invalid Operator name. Options are: safaricom or saf, airtel");
-        }
+        let op = match p_args.network.as_deref().map(str::to_lowercase).as_deref() {
+            Some("airtel") => 3,
+            Some("safaricom") | Some("saf") => 2,
+            _ => {
+                println!(" * Invalid Operator name. Options are: safaricom or saf, airtel");
+                return Ok(());
+            }
+        };
 
-        // println!("{}", op);
-        // maybe loop here
         let _ = redeem_airtime(
             tab.clone(),
             p_args.credit_amount.unwrap(),
@@ -99,7 +87,7 @@ async fn begin(p_args: Args) -> Result<(), Box<dyn Error>> {
         )
         .await;
     } else {
-        println!("provide an action dumbo");
+        println!(" * {}", "provide an action dumbo".bold().red());
         process::exit(0);
     }
     Ok(())

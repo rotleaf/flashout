@@ -11,7 +11,7 @@ pub mod account {
         amount: i32,
         phone: String,
         op: i64,
-        browser: Browser
+        browser: Browser,
     ) -> Result<(), Box<dyn Error>> {
         let url: &str = "https://flashout.io/account/rewards";
         tab.navigate_to(url)?;
@@ -32,7 +32,7 @@ pub mod account {
             tab.wait_until_navigated()?;
         }
 
-        let mut am = 2; // amount- by default its the first value which is 2
+        let mut am: i32 = 2; // amount- by default its the first value which is 2
 
         if amount == 5 {
             am = 2;
@@ -53,7 +53,12 @@ pub mod account {
 
         let currency: String = env::var("CURRENCY").expect("CURRENCY not set yet");
         let redeem_button: headless_chrome::Element = tab.find_element(".bg-primary").unwrap();
-        println!(" > trying to redeem {}{}", amount, currency.bold().green());
+        println!(
+            " > redeeming {} {} to {}",
+            amount.to_string().bold().green(),
+            currency.bold().green(),
+            format!("+{}", phone).bold()
+        );
         redeem_button.click().unwrap();
         let _ = tab.wait_until_navigated().unwrap();
         tab.wait_for_element("label.v-label:nth-child(2)")?;
@@ -107,10 +112,18 @@ pub mod account {
 
         match tab.wait_for_element("div.v-container:nth-child(3)") {
             Ok(_) => {
-                println!(" > credit delivered-[{}{}]", amount.to_string().bold(), currency.to_string().bold());
+                println!(
+                    " > credit delivered-[{}{}]",
+                    amount.to_string().bold(),
+                    currency.to_string().bold()
+                );
             }
             Err(err) => {
-                println!(" * {}-[{}]", "error".bold().red(), err.to_string().bold().red());
+                println!(
+                    " * {}-[{}]",
+                    "error".bold().red(),
+                    err.to_string().bold().red()
+                );
             }
         }
 
