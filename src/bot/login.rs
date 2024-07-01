@@ -1,7 +1,7 @@
 pub mod login {
     use colored::Colorize;
     use headless_chrome::{ Browser, Tab};
-    use std::{env, error::Error, process, sync::Arc, thread, time::Duration};
+    use std::{env, error::Error,sync::Arc, thread, time::Duration};
 
     pub async fn init(tab: Arc<Tab>, browser: Browser) -> Result<(), Box<dyn Error>> {
         let email = env::var("EMAIL").expect("set EMAIL");
