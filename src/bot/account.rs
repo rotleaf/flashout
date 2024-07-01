@@ -45,7 +45,7 @@ pub mod account {
         } else if amount == 50 {
             am = 6;
         } else {
-            println!(" > invalid amount, first child will be used");
+            println!(" > {}", "invalid amount".bold().red());
         }
 
         let balance: headless_chrome::Element = tab.wait_for_element(".text-h3")?; // you can see the balance
