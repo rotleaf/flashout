@@ -1,5 +1,5 @@
 pub mod account {
-    use std::{env, error::Error, sync::Arc,  time::Duration};
+    use std::{env, error::Error, sync::Arc, time::Duration};
 
     use headless_chrome::Tab;
 
@@ -17,7 +17,10 @@ pub mod account {
 
         println!(" > checking auth status");
         if tab
-            .wait_for_element_with_custom_timeout(".v-toolbar-title__placeholder", Duration::from_secs(3))
+            .wait_for_element_with_custom_timeout(
+                ".v-toolbar-title__placeholder",
+                Duration::from_secs(3),
+            )
             .is_ok()
         {
             println!(" > not logged in, loggin in");
@@ -44,14 +47,15 @@ pub mod account {
         }
 
         let balance: headless_chrome::Element = tab.wait_for_element(".text-h3")?; // you can see the balance
-        println!("Your balance is {}", balance.get_inner_text()?);
+        println!(" * Your balance is {}", balance.get_inner_text()?);
+        
 
-        let currency = env::var("CURRENCY").expect("CURRENCY not set yet");
+        let currency: String = env::var("CURRENCY").expect("CURRENCY not set yet");
         let redeem_button: headless_chrome::Element = tab.find_element(".bg-primary").unwrap();
+        println!(" > trying to redeem {}{}", amount, currency);
         redeem_button.click().unwrap();
         let _ = tab.wait_until_navigated().unwrap();
         tab.wait_for_element("label.v-label:nth-child(2)")?;
-        
 
         std::thread::sleep(Duration::from_secs(2));
         tab.find_element(".v-container")?;
@@ -91,17 +95,19 @@ pub mod account {
             .click()
             .unwrap();
         // confirm the number is yours and you would like to continue
-        let check_box: headless_chrome::Element = tab.find_element("label.v-label:nth-child(2)").unwrap();
+        let check_box: headless_chrome::Element =
+            tab.find_element("label.v-label:nth-child(2)").unwrap();
         check_box.click().unwrap();
 
         // initiate withdrawal
-        let redeem_button: headless_chrome::Element = tab.find_element("button.v-btn:nth-child(5)").unwrap();
+        let redeem_button: headless_chrome::Element =
+            tab.find_element("button.v-btn:nth-child(5)").unwrap();
         redeem_button.click().unwrap();
-        
+
         match tab.wait_for_element("div.v-container:nth-child(3)") {
             Ok(_) => {
                 println!(" > credit delivered-{}{}", amount, currency);
-            },
+            }
             Err(err) => {
                 println!(" * error : {err}");
             }

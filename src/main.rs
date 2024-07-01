@@ -6,7 +6,7 @@ use std::{env, process};
 
 use bot::account::account::redeem_airtime;
 use bot::login::login;
-use clap::{command,Parser, ArgAction};
+use clap::{command, ArgAction, Parser};
 use dotenv::dotenv;
 use headless_chrome::{Browser, LaunchOptionsBuilder};
 
@@ -36,20 +36,22 @@ struct Args {
     #[arg(short, long, action = ArgAction::SetTrue)]
     user_interface: bool,
 
+    /// proxy server
+    #[arg(long)]
+    proxy: Option<String>,
 }
 
 async fn begin(p_args: Args) -> Result<(), Box<dyn Error>> {
-    let ua: String = env::var("USER_AGENT").expect("set USER_AGENT");
+    let ua: String = env::var("USER_AGENT").expect("must set USER_AGENT");
     let user_agent: String = format!("--user-agent={}", ua);
 
-    let args: Vec<&str> = vec![
-        // "--proxy-server=http://192.168.238.25:8080",
-        // &proxy,
-        "--no-sandbox",
-        &user_agent,
-    ];
+    let mut args: Vec<String> = vec!["--no-sandbox".to_string(), user_agent.to_string()];
 
-    let os_args: Vec<&OsStr> = args.iter().map(|&arg| OsStr::new(arg)).collect();
+    if let Some(proxy) = &p_args.proxy {
+        args.push(format!("--proxy-server={}", proxy));
+    }
+
+    let os_args: Vec<&OsStr> = args.iter().map(AsRef::as_ref).collect();
 
     let launch_options: headless_chrome::LaunchOptions = LaunchOptionsBuilder::default()
         .args(os_args)
@@ -105,6 +107,6 @@ async fn begin(p_args: Args) -> Result<(), Box<dyn Error>> {
 async fn main() {
     dotenv().ok();
     let args: Args = Args::parse();
-    
+
     let _ = begin(args).await;
 }
