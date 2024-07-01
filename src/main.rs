@@ -6,7 +6,7 @@ use std::{env, process};
 
 use bot::account::account::redeem_airtime;
 use bot::login::login;
-use clap::{command, Parser};
+use clap::{command,Parser, ArgAction};
 use dotenv::dotenv;
 use headless_chrome::{Browser, LaunchOptionsBuilder};
 
@@ -31,6 +31,11 @@ struct Args {
     /// network, [airtel, safaricon(saf)]
     #[arg(short, long)]
     network: Option<String>,
+
+    /// include ui, run non headless mode (not recommended)
+    #[arg(short, long, action = ArgAction::SetTrue)]
+    user_interface: bool,
+
 }
 
 async fn begin(p_args: Args) -> Result<(), Box<dyn Error>> {
@@ -39,6 +44,7 @@ async fn begin(p_args: Args) -> Result<(), Box<dyn Error>> {
 
     let args: Vec<&str> = vec![
         // "--proxy-server=http://192.168.238.25:8080",
+        // &proxy,
         "--no-sandbox",
         &user_agent,
     ];
@@ -47,15 +53,15 @@ async fn begin(p_args: Args) -> Result<(), Box<dyn Error>> {
 
     let launch_options: headless_chrome::LaunchOptions = LaunchOptionsBuilder::default()
         .args(os_args)
-        .headless(true)
-        //.user_data_dir(Some(PathBuf::from("/tmp")))
+        .headless(!p_args.user_interface)
+        .user_data_dir(Some(PathBuf::from("/tmp")))
         .disable_default_args(true)
         .build()
         .unwrap();
 
     let browser: Browser = Browser::new(launch_options)?;
     let tab: Arc<headless_chrome::Tab> = browser.new_tab()?;
-    tab.enable_fetch(None, None)?;
+    // tab.enable_fetch(None, None)?;
     let _ = login::init(tab.clone());
     if p_args.action == Some("withdraw".to_string())
         || p_args.action == Some("Withdraw".to_string())
@@ -99,5 +105,6 @@ async fn begin(p_args: Args) -> Result<(), Box<dyn Error>> {
 async fn main() {
     dotenv().ok();
     let args: Args = Args::parse();
+    
     let _ = begin(args).await;
 }
