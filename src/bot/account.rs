@@ -17,7 +17,8 @@ pub mod account {
         tab.navigate_to(url)?;
         tab.wait_until_navigated()?;
 
-        println!(" > {}", "checking auth status".bold().yellow());
+        print!(" > {}", "checking auth status".bold().yellow());
+        std::thread::sleep(Duration::from_secs(2));
         if tab
             .wait_for_element_with_custom_timeout(
                 ".v-toolbar-title__placeholder",
@@ -25,12 +26,14 @@ pub mod account {
             )
             .is_ok()
         {
+            println!(" [{}]", "ERR".bold().red());
             println!(" > not logged in-[{}]", "loggin in".bold().yellow());
             let _ = login::login::init(tab.clone(), browser).await;
             let url: &str = "https://flashout.io/account/rewards";
             tab.navigate_to(url)?;
             tab.wait_until_navigated()?;
         }
+        println!(" [{}]", "OK".bold().green());
 
         let mut am: i32 = 2; // amount- by default its the first value which is 2
 
