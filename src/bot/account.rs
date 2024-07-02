@@ -151,6 +151,7 @@ pub mod account {
                     amount.to_string().bold(),
                     currency.to_string().bold()
                 );
+                close_tabs(browser.to_owned())?;
             }
             Err(err) => {
                 println!(
