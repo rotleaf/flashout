@@ -17,11 +17,23 @@ pub mod account {
         browser: &Browser,
     ) -> Result<(), Box<dyn Error>> {
         let url: &str = "https://flashout.io/account/rewards";
-        tab.navigate_to(url)?;
+
+        let nav: Result<&Tab, anyhow::Error> = tab.navigate_to(url);
+
+        // check if tab started
+        match nav {
+            Ok(_) => {
+                println!(" - session started");
+            }
+            Err(_) => {
+                panic!("unable to start");
+            }
+        };
+
         tab.wait_until_navigated()?;
 
-        print!(" > {}", "checking auth status".bold().yellow());
-        std::thread::sleep(Duration::from_secs(2));
+        print!(" > {}", "auth status".bold().yellow());
+        std::thread::sleep(Duration::from_secs(3));
         if tab
             .wait_for_element_with_custom_timeout(
                 ".v-toolbar-title__placeholder",
@@ -46,6 +58,7 @@ pub mod account {
             50 => 6,
             _ => {
                 println!(" > {}", "invalid amount".bold().red());
+                close_tabs(browser.to_owned())?;
                 -1
             }
         };

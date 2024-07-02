@@ -12,7 +12,7 @@ pub mod browser_utils {
         for tab in locked_tabs.iter() {
             tab.close_target()?;
         }
-        println!(" * ! tabs closed, [{}]", "Exiting".bold().yellow());
+        println!(" * tabs closed, [{}]", "Exiting".bold().yellow());
         process::exit(0);
     }
 }
