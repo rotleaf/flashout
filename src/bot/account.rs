@@ -1,5 +1,4 @@
 pub mod account {
-    use core::num;
     use std::{env, error::Error, process, sync::Arc, time::Duration};
 
     use colored::Colorize;
