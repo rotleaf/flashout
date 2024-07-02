@@ -50,16 +50,11 @@ pub mod account {
             }
         };
 
-        if am == -1 {
-            println!(" * invalid amount,");
-            process::exit(0);
-        }
-
         let balance: headless_chrome::Element = tab.wait_for_element(".text-h3")?; // you can see the balance
         println!(" * Your balance is {}", balance.get_inner_text()?);
 
-        let filtered = balance.get_inner_text();
-        let number_balance = match filtered {
+        let filtered: Result<String, anyhow::Error> = balance.get_inner_text();
+        let number_balance: String = match filtered {
             Ok(ok) => {
                 let parts: Vec<&str> = ok.as_str().split("\u{a0}").collect();
                 parts[1].to_string()

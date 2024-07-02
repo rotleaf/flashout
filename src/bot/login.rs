@@ -1,7 +1,7 @@
 pub mod login {
     use colored::Colorize;
     use headless_chrome::{Browser, Tab};
-    use std::{env, error::Error, sync::Arc, thread, time::Duration};
+    use std::{env, error::Error, process, sync::Arc, thread, time::Duration};
 
     use crate::utils::browser::browser_utils::close_tabs;
 
@@ -33,6 +33,7 @@ pub mod login {
                 "login failed".bold().yellow()
             );
             close_tabs(browser)?;
+            process::exit(0);
         }
         let _ = tab.wait_for_element("div.v-card");
         println!(" - {}", "logged in".bold().green());

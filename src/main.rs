@@ -10,6 +10,7 @@ use clap::{command, ArgAction, Parser};
 use colored::Colorize;
 use dotenv::dotenv;
 use headless_chrome::{Browser, LaunchOptionsBuilder};
+use utils::browser::browser_utils::close_tabs;
 
 pub mod bot;
 pub mod utils;
@@ -69,7 +70,7 @@ async fn begin(p_args: Args) -> Result<(), Box<dyn Error>> {
     if p_args.action.as_deref().map(str::to_lowercase) == Some("withdraw".to_string())
         || p_args.action.as_deref().map(str::to_lowercase) == Some("redeem".to_string())
     {
-        let op = match p_args.network.as_deref().map(str::to_lowercase).as_deref() {
+        let op: i64 = match p_args.network.as_deref().map(str::to_lowercase).as_deref() {
             Some("airtel") => 3,
             Some("safaricom") | Some("saf") => 2,
             _ => {
@@ -88,7 +89,7 @@ async fn begin(p_args: Args) -> Result<(), Box<dyn Error>> {
         .await;
     } else {
         println!(" * {}", "provide an action dumbo".bold().red());
-        process::exit(0);
+        close_tabs(browser)?;
     }
     Ok(())
 }
@@ -97,6 +98,5 @@ async fn begin(p_args: Args) -> Result<(), Box<dyn Error>> {
 async fn main() {
     dotenv().ok();
     let args: Args = Args::parse();
-
     let _ = begin(args).await;
 }
