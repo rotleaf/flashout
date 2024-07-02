@@ -36,7 +36,7 @@ pub mod login {
             process::exit(0);
         }
         let _ = tab.wait_for_element("div.v-card");
-        println!(" - {}", "logged in".bold().green());
+        println!(" - {}", "logged in, run again".bold().green());
 
         Ok(())
     }

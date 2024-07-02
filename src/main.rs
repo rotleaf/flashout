@@ -2,7 +2,7 @@ use std::error::Error;
 use std::ffi::OsStr;
 use std::path::PathBuf;
 use std::sync::Arc;
-use std::{env, process};
+use std::{env, panic};
 
 use bot::account::account::redeem_airtime;
 use bot::login::login;
@@ -88,7 +88,10 @@ async fn begin(p_args: Args) -> Result<(), Box<dyn Error>> {
         )
         .await;
     } else {
-        println!(" * {}", "provide an action dumbo".bold().red());
+        println!(
+            " * {}",
+            "provide an action, [withdraw, redeem]".bold().red()
+        );
         close_tabs(browser)?;
     }
     Ok(())
@@ -96,6 +99,18 @@ async fn begin(p_args: Args) -> Result<(), Box<dyn Error>> {
 
 #[tokio::main]
 async fn main() {
+    panic::set_hook(Box::new(|info: &panic::PanicInfo| {
+        if let Some(s) = info.payload().downcast_ref::<&str>() {
+            println!(" [{}] {}", "PANIC".bold().red(), s.bold());
+        } else {
+            println!(
+                " [{}] {}",
+                "PANIC".bold().red(),
+                "something went wrong".bold()
+            );
+        }
+    }));
+
     dotenv().ok();
     let args: Args = Args::parse();
     let _ = begin(args).await;

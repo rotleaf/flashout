@@ -1,6 +1,7 @@
 pub mod browser_utils {
     use std::{error::Error, process, sync::Arc};
 
+    use colored::Colorize;
     use headless_chrome::{Browser, Tab};
 
     pub fn close_tabs(browser: Browser) -> Result<(), Box<dyn Error>> {
@@ -11,6 +12,7 @@ pub mod browser_utils {
         for tab in locked_tabs.iter() {
             tab.close_target()?;
         }
+        println!(" * ! tabs closed, [{}]", "Exiting".bold().yellow());
         process::exit(0);
     }
 }

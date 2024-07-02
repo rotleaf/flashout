@@ -145,6 +145,7 @@ pub mod account {
                     "error".bold().red(),
                     err.to_string().bold().red()
                 );
+                close_tabs(browser.to_owned())?;
             }
         }
 
