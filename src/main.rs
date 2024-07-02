@@ -99,16 +99,16 @@ async fn begin(p_args: Args) -> Result<(), Box<dyn Error>> {
 
 #[tokio::main]
 async fn main() {
-    panic::set_hook(Box::new(|info: &panic::PanicInfo| {
-        if let Some(s) = info.payload().downcast_ref::<&str>() {
-            println!(" [{}] {}", "PANIC".bold().red(), s.bold());
+    panic::set_hook(Box::new(|panic_info: &panic::PanicInfo| {
+        let message: String = if let Some(s) = panic_info.payload().downcast_ref::<&str>() {
+            s.to_string()
+        } else if let Some(s) = panic_info.payload().downcast_ref::<String>() {
+            s.clone()
         } else {
-            println!(
-                " [{}] {}",
-                "PANIC".bold().red(),
-                "something went wrong".bold()
-            );
-        }
+            "unknown panic reason".to_string()
+        };
+
+        println!(" [{}] {}", "PANIC".bold().red(), message.bold().white());
     }));
 
     dotenv().ok();

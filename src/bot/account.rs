@@ -25,8 +25,8 @@ pub mod account {
             Ok(_) => {
                 println!(" - session started");
             }
-            Err(_) => {
-                panic!("unable to start");
+            Err(e) => {
+                panic!("[{}] {}", "unable to start".bold().yellow(), e);
             }
         };
 
