@@ -1,7 +1,9 @@
 pub mod login {
     use colored::Colorize;
     use headless_chrome::{Browser, Tab};
-    use std::{env, error::Error, process, sync::Arc, thread, time::Duration};
+    use std::{env, error::Error, sync::Arc, thread, time::Duration};
+
+    use crate::utils::browser::browser_utils::close_tabs;
 
     pub async fn init(tab: Arc<Tab>, browser: Browser) -> Result<(), Box<dyn Error>> {
         let email: String = env::var("EMAIL").expect("set EMAIL");
@@ -30,14 +32,7 @@ pub mod login {
                 "check credentials".bold().red(),
                 "login failed".bold().yellow()
             );
-            // close all tabs
-            let tabs: &Arc<std::sync::Mutex<Vec<Arc<Tab>>>> = browser.get_tabs();
-            let locked_tabs: std::sync::MutexGuard<Vec<Arc<Tab>>> =
-                tabs.lock().expect("failed to lock tabs mutex");
-            for tab in locked_tabs.iter() {
-                tab.close_target()?;
-            }
-            process::exit(0);
+            close_tabs(browser)?;
         }
         let _ = tab.wait_for_element("div.v-card");
         println!(" - {}", "logged in".bold().green());

@@ -1,17 +1,21 @@
 pub mod account {
-    use std::{env, error::Error, sync::Arc, time::Duration};
+    use core::num;
+    use std::{env, error::Error, process, sync::Arc, time::Duration};
 
     use colored::Colorize;
     use headless_chrome::{Browser, Tab};
 
-    use crate::{bot::login, utils::screenshot};
+    use crate::{
+        bot::login,
+        utils::{browser::browser_utils::close_tabs, screenshot},
+    };
 
     pub async fn redeem_airtime(
         tab: Arc<Tab>,
         amount: i32,
         phone: String,
         op: i64,
-        browser: Browser,
+        browser: &Browser,
     ) -> Result<(), Box<dyn Error>> {
         let url: &str = "https://flashout.io/account/rewards";
         tab.navigate_to(url)?;
@@ -28,31 +32,51 @@ pub mod account {
         {
             println!(" [{}]", "ERR".bold().red());
             println!(" > not logged in-[{}]", "loggin in".bold().yellow());
-            let _ = login::login::init(tab.clone(), browser).await;
+            let _ = login::login::init(tab.clone(), browser.to_owned()).await;
             let url: &str = "https://flashout.io/account/rewards";
             tab.navigate_to(url)?;
             tab.wait_until_navigated()?;
         }
         println!(" [{}]", "OK".bold().green());
 
-        let mut am: i32 = 2; // amount- by default its the first value which is 2
+        let am: i32 = match amount {
+            5 => 2,
+            10 => 3,
+            20 => 4,
+            35 => 5,
+            50 => 6,
+            _ => {
+                println!(" > {}", "invalid amount".bold().red());
+                -1
+            }
+        };
 
-        if amount == 5 {
-            am = 2;
-        } else if amount == 10 {
-            am = 3;
-        } else if amount == 20 {
-            am = 4;
-        } else if amount == 35 {
-            am = 5;
-        } else if amount == 50 {
-            am = 6;
-        } else {
-            println!(" > {}", "invalid amount".bold().red());
+        if am == -1 {
+            println!(" * invalid amount,");
+            process::exit(0);
         }
 
         let balance: headless_chrome::Element = tab.wait_for_element(".text-h3")?; // you can see the balance
         println!(" * Your balance is {}", balance.get_inner_text()?);
+
+        let filtered = balance.get_inner_text();
+        let number_balance = match filtered {
+            Ok(ok) => {
+                let parts: Vec<&str> = ok.as_str().split("\u{a0}").collect();
+                parts[1].to_string()
+            }
+            Err(_) => "0".to_string(),
+        };
+
+        if number_balance.parse::<i32>().unwrap() < amount {
+            println!(
+                " * {} - [{}]",
+                "cant proceed",
+                "balance too low".bold().yellow()
+            );
+            close_tabs(browser.to_owned())?;
+            process::exit(0);
+        }
 
         let currency: String = env::var("CURRENCY").expect("CURRENCY not set yet");
         let redeem_button: headless_chrome::Element = tab.find_element(".bg-primary").unwrap();

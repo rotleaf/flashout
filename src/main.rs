@@ -83,7 +83,7 @@ async fn begin(p_args: Args) -> Result<(), Box<dyn Error>> {
             p_args.credit_amount.unwrap(),
             p_args.phone.unwrap(),
             op,
-            browser,
+            &browser,
         )
         .await;
     } else {
