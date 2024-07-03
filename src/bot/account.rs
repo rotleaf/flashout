@@ -51,11 +51,10 @@ pub mod account {
         println!(" [{}]", "OK".bold().green());
 
         let am: i32 = match amount {
-            5 => 2,
-            10 => 3,
-            20 => 4,
-            35 => 5,
-            50 => 6,
+            10 => 2,
+            20 => 3,
+            35 => 4,
+            50 => 5,
             _ => {
                 println!(" > {}", "invalid amount".bold().red());
                 close_tabs(browser.to_owned())?;
@@ -75,14 +74,19 @@ pub mod account {
             Err(_) => "0".to_string(),
         };
 
-        if number_balance.parse::<i32>().unwrap() < amount {
-            println!(
-                " * {} - [{}]",
-                "cant proceed",
-                "balance too low".bold().yellow()
-            );
-            close_tabs(browser.to_owned())?;
-            process::exit(0);
+        match number_balance.parse::<i32>() {
+            Ok(ok) => {
+                if ok < amount {
+                    println!(
+                        " * {} - [{}]",
+                        "cant proceed",
+                        "balance too low".bold().yellow()
+                    );
+                    close_tabs(browser.to_owned())?;
+                    process::exit(0);
+                }
+            }
+            Err(_) => {}
         }
 
         let currency: String = env::var("CURRENCY").expect("CURRENCY not set yet");
@@ -142,24 +146,32 @@ pub mod account {
         // initiate withdrawal
         let redeem_button: headless_chrome::Element =
             tab.find_element("button.v-btn:nth-child(5)").unwrap();
-        redeem_button.click().unwrap();
-
-        match tab.wait_for_element("div.v-container:nth-child(3)") {
+        match redeem_button.click() {
             Ok(_) => {
-                println!(
-                    " > credit delivered-[{}{}]",
-                    amount.to_string().bold(),
-                    currency.to_string().bold()
-                );
-                close_tabs(browser.to_owned())?;
+                match tab.wait_for_element_with_custom_timeout(
+                    "div.v-container:nth-child(3)",
+                    Duration::from_secs(7),
+                ) {
+                    Ok(_) => {
+                        println!(
+                            " > credit delivered [{}{}]",
+                            amount.to_string(),
+                            currency.to_string().bold()
+                        );
+                        close_tabs(browser.to_owned())?;
+                    }
+                    Err(err) => {
+                        println!(
+                            " * {} [{}]",
+                            "error".bold().red(),
+                            err.to_string().bold().white()
+                        );
+                        close_tabs(browser.to_owned())?;
+                    }
+                }
             }
             Err(err) => {
-                println!(
-                    " * {}-[{}]",
-                    "error".bold().red(),
-                    err.to_string().bold().red()
-                );
-                close_tabs(browser.to_owned())?;
+                println!(" * Error clicking redeem button: {err}");
             }
         }
 
