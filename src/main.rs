@@ -16,7 +16,7 @@ pub mod bot;
 pub mod utils;
 
 #[derive(Parser, Debug)]
-#[command(version="0.1.9rc1", about="flashout autopilot", long_about = None)]
+#[command(version = "0.1.9rc1", about = "flashout autopilot", author = "Mbithi")]
 struct Args {
     /// action to perform, [withdraw or redeem, tasks]
     #[arg(short, long)]
