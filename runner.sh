@@ -36,7 +36,7 @@ countdown() {
 # since you can only redeem after every 10 minutes a sleepof 630 is necessary
 while true; do
     # run you executable here with arguments
-    countdown 1 0
+    countdown 10 30
 done
 
 
