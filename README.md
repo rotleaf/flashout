@@ -56,7 +56,7 @@ make debug
 
 &nbsp;&nbsp;&nbsp;&nbsp;redeem *50* to *+25411187658* of network *safaricom*
 ```bash
-  ./flashout -a withdraw -c 50 -p 25411187658 -n safaricom
+./flashout -a withdraw -c 50 -p 25411187658 -n safaricom
 ```
 
 
