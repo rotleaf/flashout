@@ -40,13 +40,13 @@
 ## Building
 
 &nbsp;&nbsp;&nbsp;&nbsp;release
-&nbsp;&nbsp;&nbsp;&nbsp;```bash
+```bash
 git clone https://github.com/rotleaf/flashout.git
 cd flashout
 make release
 ```
 &nbsp;&nbsp;&nbsp;&nbsp;debug
-&nbsp;&nbsp;&nbsp;&nbsp;```bash
+```bash
 git clone https://github.com/rotleaf/flashout.git
 cd flashout
 make debug
