@@ -2,6 +2,8 @@
 name = "flashout"
 version = "0.1.0"
 edition = "2021"
+authors = ["Mbithi"]
+repository = "https://github.com/rotleaf/flashout"
 
 [dependencies]
 anyhow = "1.0.86"
