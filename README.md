@@ -1,7 +1,7 @@
 
 # Flashout
 
-&nbsp;&nbsp;&nbsp;Auto redeem airtime from flashout.
+&nbsp;&nbsp;&nbsp;&nbsp;Auto redeem airtime from flashout.
 
 **what it is:** A session of a puppet browser.
 
