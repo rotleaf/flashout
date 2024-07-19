@@ -9,6 +9,41 @@ pub mod account {
         utils::{browser::browser_utils::close_tabs, screenshot},
     };
 
+    pub async fn balance(
+        tab: Arc<Tab>,
+        amount: i32,
+        browser: &Browser,
+    ) -> Result<(), Box<dyn Error>> {
+        let balance: headless_chrome::Element = tab.wait_for_element(".text-h3")?; // you can see the balance
+        println!(" * Your balance is {}", balance.get_inner_text()?);
+
+        let filtered: Result<String, anyhow::Error> = balance.get_inner_text();
+        let number_balance: String = match filtered {
+            Ok(ok) => {
+                let parts: Vec<&str> = ok.as_str().split("\u{a0}").collect();
+                parts[1].to_string()
+            }
+            Err(_) => "0".to_string(),
+        };
+
+        match number_balance.parse::<i32>() {
+            Ok(ok) => {
+                if ok < amount {
+                    println!(
+                        " * {} - [{}]",
+                        "cant proceed",
+                        "balance too low".bold().yellow()
+                    );
+                    close_tabs(browser.to_owned())?;
+                    process::exit(0);
+                }
+            }
+            Err(_) => {}
+        }
+
+        Ok(())
+    }
+
     pub async fn redeem_airtime(
         tab: Arc<Tab>,
         amount: i32,
@@ -62,33 +97,7 @@ pub mod account {
             }
         };
 
-        let balance: headless_chrome::Element = tab.wait_for_element(".text-h3")?; // you can see the balance
-        println!(" * Your balance is {}", balance.get_inner_text()?);
-
-        let filtered: Result<String, anyhow::Error> = balance.get_inner_text();
-        let number_balance: String = match filtered {
-            Ok(ok) => {
-                let parts: Vec<&str> = ok.as_str().split("\u{a0}").collect();
-                parts[1].to_string()
-            }
-            Err(_) => "0".to_string(),
-        };
-
-        match number_balance.parse::<i32>() {
-            Ok(ok) => {
-                if ok < amount {
-                    println!(
-                        " * {} - [{}]",
-                        "cant proceed",
-                        "balance too low".bold().yellow()
-                    );
-                    close_tabs(browser.to_owned())?;
-                    process::exit(0);
-                }
-            }
-            Err(_) => {}
-        }
-
+        // check balance here
         let currency: String = env::var("CURRENCY").expect("CURRENCY not set yet");
         let redeem_button: headless_chrome::Element = tab.find_element(".bg-primary").unwrap();
         println!(
