@@ -98,6 +98,8 @@ pub mod account {
         };
 
         // check balance here
+        let _ = balance(tab.clone(), amount, browser).await?;
+
         let currency: String = env::var("CURRENCY").expect("CURRENCY not set yet");
         let redeem_button: headless_chrome::Element = tab.find_element(".bg-primary").unwrap();
         println!(
@@ -184,7 +186,7 @@ pub mod account {
             }
         }
 
-        screenshot::screenshot::get_png(tab, Some("final.png".to_string()))?;
+        //screenshot::screenshot::get_png(tab, Some("final.png".to_string()))?;
 
         Ok(())
     }
