@@ -26,7 +26,7 @@ struct Args {
     #[arg(short, long)]
     phone: Option<String>,
 
-    /// amount to withdraw, 5, 10, 20, 35, 50
+    /// amount to withdraw, 10, 20, 35, 50
     #[arg(short, long)]
     credit_amount: Option<i32>,
 

@@ -150,7 +150,7 @@ pub mod account {
             Ok(_) => {
                 match tab.wait_for_element_with_custom_timeout(
                     "div.v-container:nth-child(3)",
-                    Duration::from_secs(7),
+                    Duration::from_secs(10),
                 ) {
                     Ok(_) => {
                         println!(
