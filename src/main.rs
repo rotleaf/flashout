@@ -16,7 +16,7 @@ pub mod bot;
 pub mod utils;
 
 #[derive(Parser, Debug)]
-#[command(version = "0.1.9rc1", about = "flashout autopilot", author = "Mbithi")]
+#[command(version = "0.1.10", about = "flashout autopilot", author = "Mbithi")]
 struct Args {
     /// action to perform, [withdraw or redeem, tasks]
     #[arg(short, long)]
@@ -98,20 +98,26 @@ async fn begin(p_args: Args) -> Result<(), Box<dyn Error>> {
 }
 
 #[tokio::main]
-async fn main() {
+async fn main() -> Result<(), Box<dyn Error>> {
     panic::set_hook(Box::new(|panic_info: &panic::PanicInfo| {
         let message: String = if let Some(s) = panic_info.payload().downcast_ref::<&str>() {
             s.to_string()
         } else if let Some(s) = panic_info.payload().downcast_ref::<String>() {
             s.clone()
         } else {
-            "unknown panic reason".to_string()
+            "i panicked, i dont know why though".to_string()
         };
 
         println!(" [{}] {}", "PANIC".bold().red(), message.bold().white());
     }));
 
     dotenv().ok();
-    let args: Args = Args::parse();
-    let _ = begin(args).await;
+
+    // add a ten minute loop
+
+    loop {
+        let args: Args = Args::parse();
+        let _ = begin(args).await;
+        let _ = utils::counter::counter::init(10).await?;
+    }
 }

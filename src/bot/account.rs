@@ -4,10 +4,7 @@ pub mod account {
     use colored::Colorize;
     use headless_chrome::{Browser, Tab};
 
-    use crate::{
-        bot::login,
-        utils::{browser::browser_utils::close_tabs, screenshot},
-    };
+    use crate::{bot::login, utils::browser::browser_utils::close_tabs};
 
     pub async fn balance(
         tab: Arc<Tab>,
@@ -178,6 +175,7 @@ pub mod account {
                             err.to_string().bold().white()
                         );
                         close_tabs(browser.to_owned())?;
+                        process::exit(0);
                     }
                 }
             }
