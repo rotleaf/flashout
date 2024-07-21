@@ -5,6 +5,7 @@ pub mod login {
 
     use crate::utils::browser::browser_utils::close_tabs;
 
+    /// init login, this will navigate to the login page automatically
     pub async fn init(tab: Arc<Tab>, browser: Browser) -> Result<(), Box<dyn Error>> {
         let email: String = env::var("EMAIL").expect("set EMAIL");
         let password: String = env::var("PASSWORD").expect("set PASSWORD");

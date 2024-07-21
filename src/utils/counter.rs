@@ -6,6 +6,7 @@ pub mod counter {
         {io::stdout, io::Write},
     };
 
+    /// start the countdown timer with custom minutes
     pub async fn init(mut minutes: u32) -> Result<(), Box<dyn Error>> {
         let mut seconds = 0;
         let mut stdout = stdout();

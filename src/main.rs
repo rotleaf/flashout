@@ -16,6 +16,7 @@ use utils::counter::counter::init;
 
 #[tokio::main]
 async fn main() -> Result<(), Box<dyn Error>> {
+    // make the panic message a better one
     panic::set_hook(Box::new(|panic_info: &panic::PanicInfo| {
         let message: String = if let Some(s) = panic_info.payload().downcast_ref::<&str>() {
             s.to_string()

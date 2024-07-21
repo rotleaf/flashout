@@ -6,6 +6,7 @@ pub mod account {
 
     use crate::{bot::login, utils::browser::browser_utils::close_tabs};
 
+    /// check the account balance, only works when on the account tab
     pub async fn balance(
         tab: Arc<Tab>,
         amount: i32,
@@ -41,6 +42,7 @@ pub mod account {
         Ok(())
     }
 
+    /// redeem the airtime, uses static selectors which might be invalid after an update
     pub async fn redeem_airtime(
         tab: Arc<Tab>,
         amount: i32,

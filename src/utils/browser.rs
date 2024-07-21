@@ -4,6 +4,8 @@ pub mod browser_utils {
     use colored::Colorize;
     use headless_chrome::{Browser, Tab};
 
+    /// iterate on all open tabs and close them
+    /// normally headless_chrome opens 3 tabs
     pub fn close_tabs(browser: Browser) -> Result<(), Box<dyn Error>> {
         // close all tabs
         // only gets called when you are running a `--user-interface` instance
