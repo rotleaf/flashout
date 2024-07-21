@@ -185,9 +185,6 @@ pub mod account {
                 println!(" * Error clicking redeem button: {err}");
             }
         }
-
-        //screenshot::screenshot::get_png(tab, Some("final.png".to_string()))?;
-
         Ok(())
     }
 }
